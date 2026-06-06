@@ -86,7 +86,7 @@
   .report-form.open { display: block; }
   .report-form p { font-size: 0.82rem; color: var(--ink-muted); margin-bottom: 8px; }
 
-  /* BÆTA VIÐ LEIKVELLI MODAL */
+  /* BÆTA VIÐ LEIKVELTI MODAL */
   #add-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; }
   #add-modal.open { display: flex; }
   #add-modal-inner { background: white; border-radius: 18px 18px 0 0; padding: 1.5rem; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.25s ease; }
@@ -143,15 +143,15 @@
 </div>
 
 <div id="controls">
-  <input type="search" id="search-input" placeholder="Leita að leikvelti eða stað…" />
+  <input type="search" id="search-input" placeholder="Leita að leikvelli eða stað…" />
   <select id="filter-tag">
     <option value="all">Allar tegundir</option>
     <option value="rennibraut">Rennibraut</option>
     <option value="klifurgrind">Klifurgrind</option>
     <option value="sandkassi">Sandkassi</option>
-    <option value="ærslabelgur">🦘 Ærslabelgur</option>
+    <option value="aerslabelgur">🦘 Ærslabelgur</option>
   </select>
-  <button id="add-park-btn" onclick="openAddModal()">+ Bæta við leikvelti</button>
+  <button id="add-park-btn" onclick="openAddModal()">+ Bæta við leikvelli</button>
 </div>
 
 <div id="region-chips">
@@ -196,7 +196,7 @@
     </div>
   </div>
   <div class="report-form" id="report-form">
-    <p>Tilkynntu vandamál eða óviðeigandi efni á þessum leikvelti.</p>
+    <p>Tilkynntu vandamál eða óviðeigandi efni á þessum leikvelli.</p>
     <div class="form-actions">
       <button class="btn btn-red" onclick="submitReport()">🚩 Senda tilkynningu</button>
       <button class="btn btn-outline" onclick="toggleReportForm()">Hætta við</button>
@@ -204,7 +204,7 @@
   </div>
 </div>
 
-<!-- BÆTA VIÐ LEIKVELLI MODAL -->
+<!-- BÆTA VIÐ LEIKVELTI MODAL -->
 <div id="add-modal">
   <div id="add-modal-inner">
     <h3>Bæta við leikvelli</h3>
@@ -216,7 +216,7 @@
     <label>Tegund *</label>
     <select id="add-type">
       <option value="leiksvæði">🛝 Leiksvæði</option>
-      <option value="ærslabelgur">🦘 Ærslabelgur</option>
+      <option value="aerslabelgur">🦘 Ærslabelgur</option>
     </select>
 
     <label>Staðsetning *</label>
@@ -356,12 +356,144 @@ function renderMarkers(parks) {
   parks.forEach(park => {
     const color = regionColors[park.region] || '#888';
     const isDotd = dotd && park.osmId === dotd.osmId;
-    const isBounce = park.type === 'ærslabelgur';
+    const isBounce = park.type === 'aerslabelgur' || park.type === 'ærslabelgur';
     const marker = L.marker([park.lat, park.lng], { icon: makeIcon(color, isDotd, isBounce) }).addTo(map);
     marker.on('click', () => showInfo(park));
     allMarkers.push({ marker, park });
   });
 }
+
+const aerslabelgirData = [
+  {name:'Klambratún',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Í rjóðri á Klambratúni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_1',isCustom:false},
+  {name:'Ægissíða',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Á fallegum stað við Ægissíðuna',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_2',isCustom:false},
+  {name:'Kringlan',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Stjörnutorgsmegin við Kringluna, stutt í Borgarleikhúsið og Borgarbókasafnið',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_3',isCustom:false},
+  {name:'Fjölskyldu- og húsdýragarðurinn',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Í Fjölskyldu- og húsdýragarðinum í Laugardal (elsti belgur landsins)',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_4',isCustom:false},
+  {name:'Réttarholtsskóli',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Á opnu svæði fyrir aftan Réttarholtsskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_5',isCustom:false},
+  {name:'Neðra Breiðholt',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Stutt frá Breiðholtsskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_6',isCustom:false},
+  {name:'Efra Breiðholt',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Við hliðina á Breiðholtslaug',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_7',isCustom:false},
+  {name:'Seljahverfi',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Rétt fyrir neðan lóð Ölduselsskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_8',isCustom:false},
+  {name:'Fossvogur',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Við minigolfvöll, strandblakvöllur stutt frá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_9',isCustom:false},
+  {name:'Laugardalur',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Ofan við tjaldsvæðið í Laugardal, leiksvæði stutt frá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_10',isCustom:false},
+  {name:'Bryggjuhverfi',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Við enda Básbryggju, við leikstæði',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_11',isCustom:false},
+  {name:'Árbær',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Á flottum stað í Árbæ',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_12',isCustom:false},
+  {name:'Norðlingaholt',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Á fallegum stað í Norðlingaholti',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_13',isCustom:false},
+  {name:'Grafarholt',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Fyrir aftan Sæmundarskóla, stutt frá Reynisvatni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_14',isCustom:false},
+  {name:'Grafarvogur',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Í botni Grafarvogs, staðsettur Kelduleið',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_15',isCustom:false},
+  {name:'Kjalarnes',lat:64.1355,lng:-21.8954,region:'Höfuðborgarsvæði',town:'Reykjavík',description:'Á fallegum stað á Kjalarnesi',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_16',isCustom:false},
+  {name:'Seltjarnarnes',lat:64.1521,lng:-22.0007,region:'Höfuðborgarsvæði',town:'Seltjarnarnes',description:'Á leikvelli við Vallarbraut',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_17',isCustom:false},
+  {name:'Mosfellsbær - Ævintýragarðurinn',lat:64.1669,lng:-21.6937,region:'Höfuðborgarsvæði',town:'Mosfellsbær',description:'Ullarnesbrekkur / Ævintýragarðurinn',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_18',isCustom:false},
+  {name:'Mosfellsbær - Stekkjarflöt',lat:64.1669,lng:-21.6937,region:'Höfuðborgarsvæði',town:'Mosfellsbær',description:'Á útivistarsvæði við Stekkjarflöt, leiktæki og strandblakvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_19',isCustom:false},
+  {name:'Kópavogur - Fossvogsdalur',lat:64.1067,lng:-21.9178,region:'Höfuðborgarsvæði',town:'Kópavogur',description:'Í Fossvogsdalnum, leikvöllur og frisbígolfvöllur á svæðinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_20',isCustom:false},
+  {name:'Kópavogur - Tröllakór',lat:64.1067,lng:-21.9178,region:'Höfuðborgarsvæði',town:'Kópavogur',description:'Við Kórinn í Kópavogi',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_21',isCustom:false},
+  {name:'Kópavogur - Dalsmári',lat:64.1067,lng:-21.9178,region:'Höfuðborgarsvæði',town:'Kópavogur',description:'Á leikvelli í Smáranum, stutt frá Sporthúsinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_22',isCustom:false},
+  {name:'Kópavogur - Salahverfi',lat:64.1067,lng:-21.9178,region:'Höfuðborgarsvæði',town:'Kópavogur',description:'Milli leikskólans Fífuhjalla og fótboltavallar, hlaupabraut við hliðina',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_23',isCustom:false},
+  {name:'Kópavogur - Gerðarsafn',lat:64.1067,lng:-21.9178,region:'Höfuðborgarsvæði',town:'Kópavogur',description:'Á leikvelli við Gerðarsafn',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_24',isCustom:false},
+  {name:'Garðabær - Urriðaholt',lat:64.0875,lng:-21.9358,region:'Höfuðborgarsvæði',town:'Garðabær',description:'Við leikvöll og fótboltavöll í Urriðaholti',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_25',isCustom:false},
+  {name:'Garðabær - Bæjargarðurinn',lat:64.0875,lng:-21.9358,region:'Höfuðborgarsvæði',town:'Garðabær',description:'Á leiksvæði í Bæjargarðinum, strandblak rétt hjá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_26',isCustom:false},
+  {name:'Garðabær - Hofsstaðaskóli',lat:64.0875,lng:-21.9358,region:'Höfuðborgarsvæði',town:'Garðabær',description:'Á túni við sparkvöll Hofsstaðaskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_27',isCustom:false},
+  {name:'Álftanes',lat:64.0717,lng:-22.0533,region:'Höfuðborgarsvæði',town:'Álftanes',description:'Í skjólgóðri laut við Álftanesskóla, leikvöllur og tveir fótboltavellir',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_28',isCustom:false},
+  {name:'Hafnarfjörður - Ásland',lat:64.0671,lng:-21.9536,region:'Höfuðborgarsvæði',town:'Hafnarfjörður',description:'Á grasbala fyrir ofan leikskólann Stekkjarás',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_29',isCustom:false},
+  {name:'Hafnarfjörður - Vellir',lat:64.0671,lng:-21.9536,region:'Höfuðborgarsvæði',town:'Hafnarfjörður',description:'Við Hraunvallaskóla, leikvöllur á staðnum',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_30',isCustom:false},
+  {name:'Hafnarfjörður - Stekkjahraun',lat:64.0671,lng:-21.9536,region:'Höfuðborgarsvæði',town:'Hafnarfjörður',description:'Við Stekkjahraun',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_31',isCustom:false},
+  {name:'Hafnarfjörður - Víðistaðatún',lat:64.0671,lng:-21.9536,region:'Höfuðborgarsvæði',town:'Hafnarfjörður',description:'Á Víðistaðatúni, tennisvöllur, aparóla, strandblak og frisbígolf á svæðinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_32',isCustom:false},
+  {name:'Hafnarfjörður - Óla Run Tún',lat:64.0671,lng:-21.9536,region:'Höfuðborgarsvæði',town:'Hafnarfjörður',description:'Á Óla Run Túni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_33',isCustom:false},
+  {name:'Grindavík',lat:63.8418,lng:-22.4348,region:'Suðurnes',town:'Grindavík',description:'Við hreystigarðinn hjá íþróttahúsinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_34',isCustom:false},
+  {name:'Vogar',lat:63.9833,lng:-22.3667,region:'Suðurnes',town:'Vogar',description:'Rétt hjá sundlauginni og frisbígolfvelli',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_35',isCustom:false},
+  {name:'Reykjanesbær - Ásbrú',lat:64.0003,lng:-22.5561,region:'Suðurnes',town:'Reykjanesbær',description:'Við Ásbrú',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_36',isCustom:false},
+  {name:'Reykjanesbær - Fjörheimar',lat:64.0003,lng:-22.5561,region:'Suðurnes',town:'Reykjanesbær',description:'Hjá Fjörheimum, hjólabrettavöllur og aparóla í nágrenni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_37',isCustom:false},
+  {name:'Garður',lat:64.0833,lng:-22.6833,region:'Suðurnes',town:'Garður',description:'Við Gerðarskóla, sundlaugina og leikvöll',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_38',isCustom:false},
+  {name:'Sandgerði',lat:64.0425,lng:-22.7097,region:'Suðurnes',town:'Sandgerði',description:'Á opnu svæði bakvið Sandgerðisskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_39',isCustom:false},
+  {name:'Akranes - Akraneshöll',lat:64.3219,lng:-22.0778,region:'Vesturland',town:'Akranes',description:'Á leikvelli bakvið Akraneshöll, stutt í Guðlaug náttúrulaug',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_40',isCustom:false},
+  {name:'Akranes - Merkurtún',lat:64.3219,lng:-22.0778,region:'Vesturland',town:'Akranes',description:'Á Merkurtúni við Skólabraut',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_41',isCustom:false},
+  {name:'Borgarnes',lat:64.5382,lng:-21.9213,region:'Vesturland',town:'Borgarnes',description:'Við frjálsíþróttavöll',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_42',isCustom:false},
+  {name:'Húsafell',lat:64.7,lng:-20.9,region:'Vesturland',town:'Húsafell',description:'Á leikvelli við golfvöllinn og sundlaugina',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_43',isCustom:false},
+  {name:'Svignaskarð 1',lat:64.5667,lng:-21.7333,region:'Vesturland',town:'Svignaskarð',description:'Neðst í orlofshúsahverfinu, fótboltavöllur við hann',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_44',isCustom:false},
+  {name:'Svignaskarð 2',lat:64.5667,lng:-21.7333,region:'Vesturland',town:'Svignaskarð',description:'Í miðju orlofshúsahverfinu, leikvöllur við hann',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_45',isCustom:false},
+  {name:'Svignaskarð 3',lat:64.5667,lng:-21.7333,region:'Vesturland',town:'Svignaskarð',description:'Í efsta hluta orlofshúsahverfisins, nýlegur leikvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_46',isCustom:false},
+  {name:'Munaðarnes 1',lat:64.6167,lng:-21.5,region:'Vesturland',town:'Munaðarnes',description:'Í orlofshúsahverfi, körfuboltavöllur við hann',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_47',isCustom:false},
+  {name:'Munaðarnes 2',lat:64.6167,lng:-21.5,region:'Vesturland',town:'Munaðarnes',description:'Á leikvelli við veitingastaðinn, minigolf og sparkvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_48',isCustom:false},
+  {name:'Munaðarnes 3',lat:64.6167,lng:-21.5,region:'Vesturland',town:'Munaðarnes',description:'Á leikvelli við veitingastaðinn, minigolf og sparkvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_49',isCustom:false},
+  {name:'Búðardalur',lat:65.0833,lng:-21.7833,region:'Vesturland',town:'Búðardalur',description:'Í Búðardal',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_50',isCustom:false},
+  {name:'Djúpidalur',lat:65.1167,lng:-21.6667,region:'Vesturland',town:'Djúpidalur',description:'Í Djúpadal',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_51',isCustom:false},
+  {name:'Grundarfjörður',lat:64.9167,lng:-23.25,region:'Vesturland',town:'Grundarfjörður',description:'Við sundlaug og tjaldsvæði',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_52',isCustom:false},
+  {name:'Ólafsvík',lat:64.8942,lng:-23.7083,region:'Vesturland',town:'Ólafsvík',description:'Á opnu svæði ásamt hjólabrettavelli við heilsugæsluna',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_53',isCustom:false},
+  {name:'Rif',lat:64.9167,lng:-23.8167,region:'Vesturland',town:'Rif',description:'Á leikvelli í miðju íbúðahverfi',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_54',isCustom:false},
+  {name:'Hellissandur',lat:64.9167,lng:-23.9,region:'Vesturland',town:'Hellissandur',description:'Við Munaðarhól, útsýni á Snæfellsjökul',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_55',isCustom:false},
+  {name:'Stykkishólmur',lat:65.075,lng:-22.7333,region:'Vesturland',town:'Stykkishólmur',description:'Á leikvelli með aparólu og fótboltavelli, sundlaug rétt hjá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_56',isCustom:false},
+  {name:'Miðhraun 2',lat:64.0,lng:-22.0,region:'Vesturland',town:'Miðhraun',description:'Hjá Hótel Miðhraun, á opnu svæði',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_57',isCustom:false},
+  {name:'Flateyri',lat:66.05,lng:-23.5167,region:'Vesturland',town:'Flateyri',description:'Á leikvelli í göngufæri við tjaldsvæðið, skjólveggur með palli',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_58',isCustom:false},
+  {name:'Suðureyri',lat:66.1333,lng:-23.5333,region:'Vesturland',town:'Suðureyri',description:'Á Suðureyri',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_59',isCustom:false},
+  {name:'Bolungarvík',lat:66.15,lng:-23.2667,region:'Vesturland',town:'Bolungarvík',description:'Á leikvelli stutt frá sundlauginni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_60',isCustom:false},
+  {name:'Súðavík',lat:66.05,lng:-23.0667,region:'Vesturland',town:'Súðavík',description:'Á opnu svæði stutt frá íþróttahúsi og Melrakkasetrinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_61',isCustom:false},
+  {name:'Hólmavík',lat:65.7,lng:-21.6833,region:'Vesturland',town:'Hólmavík',description:'Við íþróttahúsið, sundlaugina og tjaldsvæðið',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_62',isCustom:false},
+  {name:'Tálknafjörður',lat:65.6333,lng:-23.8,region:'Vesturland',town:'Tálknafjörður',description:'Við höfnina, nálægt sundlauginni og tjaldsvæðinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_63',isCustom:false},
+  {name:'Patreksfjörður',lat:65.5583,lng:-23.9833,region:'Vesturland',town:'Patreksfjörður',description:'Á tjaldsvæði, sund, skógrækt, sparkvöllur og strandblak í nágrenni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_64',isCustom:false},
+  {name:'Bíldudalur',lat:65.6833,lng:-23.5833,region:'Vesturland',town:'Bíldudalur',description:'Við höfnina, nálægt sundlauginni og tjaldsvæðinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_65',isCustom:false},
+  {name:'Flókalundur',lat:65.4167,lng:-22.6667,region:'Vesturland',town:'Flókalundur',description:'Á leikvelli við orlofshúsahverfi',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_66',isCustom:false},
+  {name:'Blönduós',lat:65.6614,lng:-20.2878,region:'Norðurland',town:'Blönduós',description:'Við grunnskólann skammt frá brúnni yfir Blöndu, sparkvöllur, körfubolti, klifurkastali, sundlaug rétt hjá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_67',isCustom:false},
+  {name:'Skagaströnd',lat:65.8333,lng:-20.3,region:'Norðurland',town:'Skagaströnd',description:'Á opnu svæði við Árnes, stutt frá kaffi Bjarmanes',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_68',isCustom:false},
+  {name:'Hvammstangi',lat:65.6,lng:-20.95,region:'Norðurland',town:'Hvammstangi',description:'Milli leikskólans og grunnskólans, brú frá leikvelli',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_69',isCustom:false},
+  {name:'Sauðárkrókur',lat:65.75,lng:-19.6333,region:'Norðurland',town:'Sauðárkrókur',description:'Við sundlaug og í göngufæri við tjaldsvæðið',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_70',isCustom:false},
+  {name:'Hofsós',lat:65.8931,lng:-19.4183,region:'Norðurland',town:'Hofsós',description:'Við grunnskólann, stutt frá tjaldsvæðinu, aparóla og sparkvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_71',isCustom:false},
+  {name:'Varmahlíð',lat:65.55,lng:-19.55,region:'Norðurland',town:'Varmahlíð',description:'Við tjaldsvæðið, stutt í fótboltavöll og sund',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_72',isCustom:false},
+  {name:'Siglufjörður',lat:66.15,lng:-18.9167,region:'Norðurland',town:'Siglufjörður',description:'Í skjólgóðu rými bakvið Raffó',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_73',isCustom:false},
+  {name:'Ólafsfjörður',lat:66.0667,lng:-18.65,region:'Norðurland',town:'Ólafsfjörður',description:'Neðan við sundlaugina, við skíðastökkbrautina',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_74',isCustom:false},
+  {name:'Dalvík',lat:65.9667,lng:-18.5333,region:'Norðurland',town:'Dalvík',description:'Við Dalvíkurskóla á leiksvæði skólans',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_75',isCustom:false},
+  {name:'Hrísey',lat:65.9833,lng:-18.4,region:'Norðurland',town:'Hrísey',description:'Fyrsti áfangastaður þegar komið er úr ferjunni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_76',isCustom:false},
+  {name:'Hjalteyri',lat:65.8833,lng:-18.2667,region:'Norðurland',town:'Hjalteyri',description:'Á opnu svæði, nálægt veitingastaðnum Eyrinni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_77',isCustom:false},
+  {name:'Grenivík',lat:65.95,lng:-18.1667,region:'Norðurland',town:'Grenivík',description:'Á leikvelli við Túngötu, við sambýli aldraðra',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_78',isCustom:false},
+  {name:'Svalbarðseyri',lat:65.75,lng:-18.0833,region:'Norðurland',town:'Svalbarðseyri',description:'Á leikvelli við Valsárskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_79',isCustom:false},
+  {name:'Akureyri - Sundlaug 1',lat:65.6835,lng:-18.0878,region:'Norðurland',town:'Akureyri',description:'Í sundlaugagarði Akureyrar (tveir belgir hlið við hlið)',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_80',isCustom:false},
+  {name:'Akureyri - Sundlaug 2',lat:65.6835,lng:-18.0878,region:'Norðurland',town:'Akureyri',description:'Í sundlaugagarði Akureyrar (tveir belgir hlið við hlið)',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_81',isCustom:false},
+  {name:'Kjarnaskógur',lat:65.6835,lng:-18.0878,region:'Norðurland',town:'Akureyri',description:'Á útivistarsvæði, borðtennis, strandblak og minigolf í nágrenni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_82',isCustom:false},
+  {name:'Þelamörk',lat:65.55,lng:-18.3,region:'Norðurland',town:'Þelamörk',description:'Á leikvelli Þelamerkurskóla, sparkvöllur og sund stutt frá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_83',isCustom:false},
+  {name:'Grímsey',lat:66.55,lng:-18.0167,region:'Norðurland',town:'Grímsey',description:'Við grunnskólann, leikvöllur rétt hjá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_84',isCustom:false},
+  {name:'Húsavík',lat:66.0449,lng:-17.3389,region:'Norðurland',town:'Húsavík',description:'Við leikvöllinn hjá Borgarhólsskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_85',isCustom:false},
+  {name:'Sundlaugin Húsavík',lat:66.0449,lng:-17.3389,region:'Norðurland',town:'Húsavík',description:'Við hlið sundlaugarinnar',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_86',isCustom:false},
+  {name:'Mývatn',lat:65.6,lng:-17.0,region:'Norðurland',town:'Mývatn',description:'Við Mývatn',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_87',isCustom:false},
+  {name:'Reykjahlíð',lat:65.6,lng:-17.0,region:'Norðurland',town:'Mývatn',description:'Við sparkvöll, sundlaug og blakvöll, stutt á golfvöll',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_88',isCustom:false},
+  {name:'Kópasker',lat:66.3,lng:-16.45,region:'Norðurland',town:'Kópasker',description:'Við skjálftasetrið',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_89',isCustom:false},
+  {name:'Raufarhöfn',lat:66.45,lng:-15.95,region:'Norðurland',town:'Raufarhöfn',description:'Við sundlaug og sparkvöll',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_90',isCustom:false},
+  {name:'Þórshöfn',lat:66.2,lng:-15.3333,region:'Norðurland',town:'Þórshöfn',description:'Við íþróttahúsið, innisundlaug og fótboltavöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_91',isCustom:false},
+  {name:'Bakkafjörður',lat:66.0167,lng:-14.8167,region:'Norðurland',town:'Bakkafjörður',description:'Á opnu svæði við tjaldsvæðið',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_92',isCustom:false},
+  {name:'Þingeyjarsveit - Stórutjarnarskóli',lat:65.8833,lng:-17.3333,region:'Norðurland',town:'Þingeyjarsveit',description:'Við Stórutjarnarskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_93',isCustom:false},
+  {name:'Þingeyjarskóli',lat:65.8833,lng:-17.3333,region:'Norðurland',town:'Þingeyjarsveit',description:'Á skólalóð Þingeyjarskóla, bakvið skólann',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_94',isCustom:false},
+  {name:'Heiðarbær',lat:65.65,lng:-17.45,region:'Norðurland',town:'Reykjahverfi',description:'Við Heiðarbæ, tjaldstæði, veitingastaður, sundlaug og sparkvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_95',isCustom:false},
+  {name:'Vaglaskógur',lat:65.6333,lng:-18.0833,region:'Norðurland',town:'Vaglaskógur',description:'Á Hróarstaðanesi neðra, með sandkassa',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_96',isCustom:false},
+  {name:'Einarsstaðir',lat:65.25,lng:-14.4,region:'Austurland',town:'Fljótsdalshérað',description:'Í orlofshúsahverfi Einarsstaða, í rjóðri við minigolfvöll',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_97',isCustom:false},
+  {name:'Höfðavík',lat:65.1,lng:-14.75,region:'Austurland',town:'Hallormsstaður',description:'Á leikvelli við Lagarfljót í Hallormsstaðaskógi',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_98',isCustom:false},
+  {name:'Eskifjörður',lat:65.0667,lng:-14.0167,region:'Austurland',town:'Eskifjörður',description:'Á opnu svæði bakvið sjóminjasafnið í miðbænum',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_99',isCustom:false},
+  {name:'Reyðarfjörður',lat:65.0333,lng:-14.2167,region:'Austurland',town:'Reyðarfjörður',description:'Á leiksvæði við íþróttahúsið, við sparkvöllinn',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_100',isCustom:false},
+  {name:'Neskaupstaður',lat:65.15,lng:-13.6833,region:'Austurland',town:'Neskaupstaður',description:'Ofan við bæinn við tjaldsvæðið, leikvöllur, frisbígolf og strandblak',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_101',isCustom:false},
+  {name:'Fáskrúðsfjörður',lat:64.9333,lng:-14.0,region:'Austurland',town:'Fáskrúðsfjörður',description:'Í Skrúðgarðinum vestan megin í bænum, frisbígolfvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_102',isCustom:false},
+  {name:'Stöðvarfjörður',lat:64.8333,lng:-13.9,region:'Austurland',town:'Stöðvarfjörður',description:'Á leikvelli í göngufæri frá Steinasafni Petru',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_103',isCustom:false},
+  {name:'Breiðdalsvík',lat:64.7833,lng:-14.0167,region:'Austurland',town:'Breiðdalsvík',description:'Í göngufjarlægð frá Hótel Bláfelli, tjörn við hann',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_104',isCustom:false},
+  {name:'Djúpivogur',lat:64.65,lng:-14.2833,region:'Austurland',town:'Djúpivogur',description:'Á íþróttavellinum Neistavelli',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_105',isCustom:false},
+  {name:'Höfn',lat:64.2544,lng:-15.2072,region:'Austurland',town:'Höfn í Hornafirði',description:'Hjá sundlauginni, fylgir regnbogagöngustígnum',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_106',isCustom:false},
+  {name:'Selfoss',lat:63.9336,lng:-20.9978,region:'Suðurland',town:'Selfoss',description:'Við Sunnulækjarskóla, fullbúinn leikvöllur',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_107',isCustom:false},
+  {name:'Eyrarbakki',lat:63.8667,lng:-21.1667,region:'Suðurland',town:'Eyrarbakki',description:'Á Garðstúni við leikvöll, milli húsa á byggðasafnssýningunni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_108',isCustom:false},
+  {name:'Stokkseyri',lat:63.8333,lng:-21.0333,region:'Suðurland',town:'Stokkseyri',description:'Við grunnskólann, nálægt Draugasetrinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_109',isCustom:false},
+  {name:'Þorlákshöfn',lat:63.85,lng:-21.3667,region:'Suðurland',town:'Þorlákshöfn',description:'Fyrir utan ráðhúsið við skrúðgarðinn, leikvöllur og körfubolti rétt hjá',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_110',isCustom:false},
+  {name:'Ölfusborgir',lat:63.9,lng:-21.2,region:'Suðurland',town:'Ölfusborgir',description:'Í orlofshúsahverfi',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_111',isCustom:false},
+  {name:'Miðdalur',lat:64.1,lng:-20.5,region:'Suðurland',town:'Miðdalur',description:'Við tjaldsvæði í Miðdal',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_112',isCustom:false},
+  {name:'Tjaldsvæðið Skjól',lat:64.2333,lng:-20.5333,region:'Suðurland',town:'Biskupstungur',description:'Á tjaldsvæðinu Skjóli, milli Gullfoss og Geysis, veitingastaður og minigolf',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_113',isCustom:false},
+  {name:'Miðhúsaskógur',lat:64.2333,lng:-20.5333,region:'Suðurland',town:'Biskupstungur',description:'Á leiksvæði Klettabóls, orlofshúsasvæði VR',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_114',isCustom:false},
+  {name:'Skógarnes',lat:64.2,lng:-20.6,region:'Suðurland',town:'Apavatn',description:'Á orlofssvæði í Skógarnesi, opið svæði með útsýni yfir vatnið, aparóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_115',isCustom:false},
+  {name:'Skógarnes 2',lat:64.2,lng:-20.6,region:'Suðurland',town:'Apavatn',description:'Á orlofssvæði í Skógarnesi, í skjólgóðu rjóðri, leiksvæði hinum megin',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_116',isCustom:false},
+  {name:'Laugarvatn SN1',lat:64.2167,lng:-20.7333,region:'Suðurland',town:'Laugarvatn',description:'Á orlofssvæði SN1, skjólgott svæði með fótboltavelli',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_117',isCustom:false},
+  {name:'Félag vélstjóra og málmtæknimanna (VM)',lat:64.2167,lng:-20.7333,region:'Suðurland',town:'Laugarvatn',description:'Á orlofshúsasvæði VM, leikvöllur, minigolf og sundlaug',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_118',isCustom:false},
+  {name:'Brúarásskóli',lat:64.25,lng:-20.8333,region:'Suðurland',town:'Bláskógabyggð',description:'Á leikvelli við skólann, milli frisbígolfvallar og sparkvallar',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_119',isCustom:false},
+  {name:'Flóaskóli',lat:63.9667,lng:-20.75,region:'Suðurland',town:'Flói',description:'Á skólalóðinni við Flóaskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_120',isCustom:false},
+  {name:'Slakki',lat:64.1,lng:-20.5833,region:'Suðurland',town:'Laugarás',description:'Í dýragarðinum Slakka',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_121',isCustom:false},
+  {name:'Keruhraun',lat:64.15,lng:-20.8333,region:'Suðurland',town:'Keruhraun',description:'Við sumarbústaðahverfi í Keruhrauni',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_122',isCustom:false},
+  {name:'Hvolsvöllur',lat:63.75,lng:-20.2167,region:'Suðurland',town:'Hvolsvöllur',description:'Við félagsheimilið á opnu svæði í miðbæ',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_123',isCustom:false},
+  {name:'Hellishólar',lat:63.8,lng:-20.0833,region:'Suðurland',town:'Fljótshlíð',description:'Á sögusviði Brennu-Njálssögu með útsýni til Eyjafjallajökuls',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_124',isCustom:false},
+  {name:'Þykkvibær',lat:63.7833,lng:-20.6167,region:'Suðurland',town:'Þykkvibær',description:'Á tjaldsvæðinu í miðju þorpsins',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_125',isCustom:false},
+  {name:'Hof í Öræfum',lat:64.0,lng:-16.5,region:'Suðurland',town:'Öræfi',description:'Á skólalóð, sést frá þjóðveginum, klifurveggur rétt hjá (ekki á skólatíma 8-16:30)',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_126',isCustom:false},
+  {name:'Kirkjubæjarklaustur',lat:63.7833,lng:-18.05,region:'Suðurland',town:'Kirkjubæjarklaustur',description:'Á leikvelli við íþróttamiðstöðina, útsýni til Systrafoss',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_127',isCustom:false},
+  {name:'Vestmannaeyjar - Stakkagerðistún',lat:63.4417,lng:-20.2778,region:'Suðurland',town:'Vestmannaeyjar',description:'Á Stakkagerðistúni, leiktæki á svæðinu',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_128',isCustom:false},
+  {name:'Vestmannaeyjar - Hamarsskóli',lat:63.4417,lng:-20.2778,region:'Suðurland',town:'Vestmannaeyjar',description:'Á leikvelli Hamarsskóla',type:'aerslabelgur',tags:['aerslabelgur'],osmId:'belgur_129',isCustom:false}
+];
 
 async function init() {
   try {
@@ -370,7 +502,7 @@ async function init() {
 
     document.getElementById('loading-text').textContent = 'Sæki viðbótargögn…';
     const customParks = await fetchCustomParks();
-    allParks = [...osmParks, ...customParks];
+    allParks = [...osmParks, ...customParks, ...aerslabelgirData];
 
     const osmIds = osmParks.map(p => p.osmId);
     const sbInfo = await fetchSupabaseInfo(osmIds);
@@ -478,7 +610,7 @@ async function submitReport() {
   showToast('Tilkynning send 🚩');
 }
 
-// BÆTA VIÐ LEIKVELLI
+// BÆTA VIÐ LEIKVELTI
 function openAddModal() {
   document.getElementById('add-modal').classList.add('open');
   document.getElementById('coords-display').textContent = 'Smelltu á kortið til að velja staðsetningu';
@@ -549,7 +681,7 @@ function applyFilters() {
     const ms = name.toLowerCase().includes(search) || (park.address||'').toLowerCase().includes(search);
     const mr = activeRegionFilter === 'all' || park.region === activeRegionFilter;
     const allTags = [...(park.tags||[])];
-    if (park.type === 'ærslabelgur') allTags.push('ærslabelgur');
+    if (park.type === 'aerslabelgur' || park.type === 'ærslabelgur') allTags.push('ærslabelgur');
     const mt = tag === 'all' || allTags.includes(tag);
     if (ms && mr && mt) { marker.addTo(map); visible++; } else map.removeLayer(marker);
   });
