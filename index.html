@@ -98,6 +98,10 @@
   #add-modal .form-actions { display: flex; gap: 8px; margin-top: 14px; }
   #pick-on-map-btn { font-family: var(--font-body); font-size: 0.8rem; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--sand); cursor: pointer; margin-top: 6px; }
   #coords-display { font-size: 0.78rem; color: var(--green-dark); margin-top: 4px; min-height: 18px; }
+  #mini-map { width: 100%; height: 220px; border-radius: 10px; border: 1px solid var(--border); margin-top: 8px; display: none; }
+  #mini-map.visible { display: block; }
+  .mini-map-hint { font-size: 0.75rem; color: var(--ink-muted); text-align: center; margin-top: 4px; display: none; }
+  .mini-map-hint.visible { display: block; }
 
   #statusbar { padding: 0.5rem 1.5rem; font-size: 0.75rem; color: var(--ink-muted); background: var(--sand); border-top: 1px solid var(--border); display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
 
@@ -220,10 +224,12 @@
     </select>
 
     <label>Staðsetning *</label>
-    <button id="pick-on-map-btn" onclick="startPickingLocation()">📍 Velja á korti</button>
-    <div id="coords-display">Smelltu á kortið til að velja staðsetningu</div>
-    <input type="text" id="add-lat" placeholder="Breidd (lat)" style="margin-top:6px;" />
-    <input type="text" id="add-lng" placeholder="Lengd (lng)" style="margin-top:6px;" />
+    <button id="pick-on-map-btn" onclick="openMiniMap()">📍 Velja á korti</button>
+    <div id="coords-display">Engin staðsetning valin</div>
+    <div id="mini-map"></div>
+    <p class="mini-map-hint" id="mini-map-hint">Smelltu á kortið til að merkja staðsetningu</p>
+    <input type="hidden" id="add-lat" />
+    <input type="hidden" id="add-lng" />
 
     <label>Landshluti</label>
     <select id="add-region">
@@ -611,38 +617,61 @@ async function submitReport() {
 }
 
 // BÆTA VIÐ LEIKVELTI
+let miniMap = null, miniMarker = null;
+
 function openAddModal() {
   document.getElementById('add-modal').classList.add('open');
-  document.getElementById('coords-display').textContent = 'Smelltu á kortið til að velja staðsetningu';
+  document.getElementById('coords-display').textContent = 'Engin staðsetning valin';
   document.getElementById('add-lat').value = '';
   document.getElementById('add-lng').value = '';
+  document.getElementById('mini-map').classList.remove('visible');
+  document.getElementById('mini-map-hint').classList.remove('visible');
+  if (miniMap) { miniMap.remove(); miniMap = null; miniMarker = null; }
 }
 
 function closeAddModal() {
   document.getElementById('add-modal').classList.remove('open');
-  pickingLocation = false;
-  map.getContainer().style.cursor = '';
+  if (miniMap) { miniMap.remove(); miniMap = null; miniMarker = null; }
+  document.getElementById('mini-map').classList.remove('visible');
+  document.getElementById('mini-map-hint').classList.remove('visible');
 }
 
-function startPickingLocation() {
-  closeAddModal();
-  pickingLocation = true;
-  map.getContainer().style.cursor = 'crosshair';
-  showToast('Smelltu á kortið til að velja staðsetningu');
-}
+function openMiniMap() {
+  const container = document.getElementById('mini-map');
+  const hint = document.getElementById('mini-map-hint');
+  container.classList.add('visible');
+  hint.classList.add('visible');
 
-map.on('click', function(e) {
-  if (!pickingLocation) return;
-  pickingLocation = false;
-  map.getContainer().style.cursor = '';
-  const lat = e.latlng.lat.toFixed(6);
-  const lng = e.latlng.lng.toFixed(6);
-  document.getElementById('add-lat').value = lat;
-  document.getElementById('add-lng').value = lng;
-  document.getElementById('coords-display').textContent = `📍 ${lat}, ${lng}`;
-  document.getElementById('add-region').value = guessRegion(parseFloat(lat), parseFloat(lng));
-  openAddModal();
-});
+  if (miniMap) { miniMap.remove(); miniMap = null; miniMarker = null; }
+
+  setTimeout(() => {
+    miniMap = L.map('mini-map', { zoomControl: true }).setView([64.9, -18.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap', maxZoom: 19,
+    }).addTo(miniMap);
+
+    miniMap.on('click', function(e) {
+      const lat = e.latlng.lat.toFixed(6);
+      const lng = e.latlng.lng.toFixed(6);
+
+      document.getElementById('add-lat').value = lat;
+      document.getElementById('add-lng').value = lng;
+      document.getElementById('coords-display').textContent = '📍 ' + lat + ', ' + lng;
+      document.getElementById('add-region').value = guessRegion(parseFloat(lat), parseFloat(lng));
+
+      if (miniMarker) miniMap.removeLayer(miniMarker);
+      miniMarker = L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: '',
+          html: '<div style="width:24px;height:24px;background:#1D9E75;border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">📍</div>',
+          iconSize: [24, 24], iconAnchor: [12, 12],
+        })
+      }).addTo(miniMap);
+
+      document.getElementById('mini-map-hint').textContent = '✓ Staðsetning valin — smelltu aftur til að breyta';
+    });
+  }, 100);
+}
 
 async function submitNewPark() {
   const name = document.getElementById('add-name').value.trim();
