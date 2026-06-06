@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leikvellar Íslands</title>
+<meta name="description" content="Yfirlit yfir leikvelli á Íslandi — finndu leiksvæði nálægt þér." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1D9E75;
+    --green-light: #e1f5ee;
+    --green-dark: #0f6e56;
+    --sand: #f7f3ed;
+    --ink: #1a1a18;
+    --ink-muted: #5f5e5a;
+    --border: rgba(26,26,24,0.12);
+    --radius: 12px;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+
+    --c-hofudborg: #1D9E75;
+    --c-nordur: #178DD8;
+    --c-sudur: #BA7517;
+    --c-sudurnes: #D4537E;
+    --c-vestur: #7F77DD;
+    --c-austur: #D85A30;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: white;
+    padding: 1.25rem 1.5rem 1rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  header h1 span {
+    color: #5DCAA5;
+  }
+
+  header p {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+  }
+
+  #park-count-header {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    font-style: italic;
+    color: #5DCAA5;
+    white-space: nowrap;
+  }
+
+  #park-count-header small {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-style: normal;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* DOTD */
+  #dotd-section {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  #dotd-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green);
+    background: var(--green-light);
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #dotd-name {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  #dotd-meta {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+
+  #dotd-zoom {
+    margin-left: auto;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.4rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  #dotd-zoom:hover { background: var(--green-dark); }
+
+  /* CONTROLS */
+  #controls {
+    padding: 0.75rem 1.5rem;
+    background: var(--sand);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #controls input, #controls select {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: white;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #controls input { flex: 1; min-width: 160px; }
+  #controls input:focus, #controls select:focus { border-color: var(--green); }
+
+  /* REGION CHIPS */
+  #region-chips {
+    padding: 0.6rem 1.5rem;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: var(--sand);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chip {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    font-family: var(--font-body);
+    font-weight: 500;
+  }
+  .chip:hover { opacity: 0.8; }
+  .chip.active { opacity: 1; transform: scale(1.04); }
+
+  /* MAP */
+  #map {
+    width: 100%;
+    height: calc(100vh - 280px);
+    min-height: 340px;
+  }
+
+  /* SIDEBAR / INFO PANEL */
+  #info-panel {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+    padding: 1.25rem 1.5rem 2rem;
+    z-index: 1000;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
+    animation: slideUp 0.25s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  #info-panel h2 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  #info-panel .meta {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+  }
+
+  #info-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tag-pill {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  #info-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    background: var(--sand);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-muted);
+  }
+
+  /* STATUS BAR */
+  #statusbar {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    background: var(--sand);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  #statusbar span { display: flex; align-items: center; gap: 4px; }
+
+  /* LEAFLET OVERRIDES */
+  .leaflet-control-attribution { font-size: 10px !important; }
+
+  /* LEGEND */
+  .legend {
+    background: white;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    font-family: var(--font-body);
+    line-height: 1.8;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  @media (max-width: 600px) {
+    header { padding: 1rem; }
+    #controls { padding: 0.6rem 1rem; }
+    #region-chips { padding: 0.6rem 1rem; }
+    #statusbar { padding: 0.4rem 1rem; }
+    #dotd-section { padding: 0.8rem 1rem; }
+    #map { height: calc(100vh - 320px); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Leikvellar <span>Íslands</span></h1>
+    <p>Kortlagning leikvella um allt land</p>
+  </div>
+  <div id="park-count-header">
+    <span id="total-count">0</span>
+    <small>leikvellir skráðir</small>
+  </div>
+</header>
+
+<div id="dotd-section">
+  <span id="dotd-label">⭐ Leiksvæði dagsins</span>
+  <div>
+    <div id="dotd-name"></div>
+    <div id="dotd-meta"></div>
+  </div>
+  <button id="dotd-zoom" onclick="zoomToDotd()">Sýna á korti →</button>
+</div>
+
+<div id="controls">
+  <input type="search" id="search-input" placeholder="Leita að leikvelti eða stað…" />
+  <select id="filter-tag">
+    <option value="all">Allur búnaður</option>
+    <option value="rennibraut">Rennibraut</option>
+    <option value="klifurgrind">Klifurgrind</option>
+    <option value="sandkassi">Sandkassi</option>
+    <option value="hjólastígur">Hjólastígur</option>
+  </select>
+</div>
+
+<div id="region-chips">
+  <button class="chip active" data-region="all" style="background:#1a1a1822;color:var(--ink);border-color:var(--border);">Allt land</button>
+  <button class="chip" data-region="Höfuðborgarsvæði" style="background:#1D9E7518;color:#0f6e56;border-color:#1D9E7555;">Höfuðborgarsvæði</button>
+  <button class="chip" data-region="Norðurland" style="background:#178DD818;color:#0c5a8a;border-color:#178DD855;">Norðurland</button>
+  <button class="chip" data-region="Suðurland" style="background:#BA751718;color:#7a4d0f;border-color:#BA751755;">Suðurland</button>
+  <button class="chip" data-region="Suðurnes" style="background:#D4537E18;color:#993356;border-color:#D4537E55;">Suðurnes</button>
+  <button class="chip" data-region="Vesturland" style="background:#7F77DD18;color:#534AB7;border-color:#7F77DD55;">Vesturland</button>
+  <button class="chip" data-region="Austurland" style="background:#D85A3018;color:#993c1d;border-color:#D85A3055;">Austurland</button>
+</div>
+
+<div id="map"></div>
+
+<div id="statusbar">
+  <span>🗺️ <strong id="visible-count">0</strong> leikvellir sýnilegir</span>
+  <span>Smelltu á merki til að sjá upplýsingar</span>
+</div>
+
+<div id="info-panel">
+  <button id="info-close" onclick="closeInfo()">✕</button>
+  <h2 id="info-name"></h2>
+  <div class="meta" id="info-meta"></div>
+  <div id="info-tags"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ============================================================
+//  GÖGN — bæta við leikvelti hér!
+// ============================================================
+const parks = [
+  { name: "Laugardalur leiksvæði", lat: 64.1418, lng: -21.8795, address: "Laugardalur, Reykjavík", region: "Höfuðborgarsvæði", tags: ["rennibraut", "klifurgrind", "sandkassi"] },
+  { name: "Öskjuhlíð leiksvæði", lat: 64.1283, lng: -21.9222, address: "Öskjuhlíð, Reykjavík", region: "Höfuðborgarsvæði", tags: ["rennibraut"] },
+  { name: "Hljómskálagarður", lat: 64.1462, lng: -21.9238, address: "Hljómskálagarður, Reykjavík", region: "Höfuðborgarsvæði", tags: ["sandkassi", "rennibraut"] },
+  { name: "Grafarvogur leiksvæði", lat: 64.1603, lng: -21.8507, address: "Grafarvogur, Reykjavík", region: "Höfuðborgarsvæði", tags: ["klifurgrind", "rennibraut", "sandkassi"] },
+  { name: "Fossvogur leiksvæði", lat: 64.1213, lng: -21.9185, address: "Fossvogur, Reykjavík", region: "Höfuðborgarsvæði", tags: ["rennibraut", "sandkassi"] },
+  { name: "Garðabær leiksvæði", lat: 64.0893, lng: -21.9253, address: "Garðabær", region: "Höfuðborgarsvæði", tags: ["klifurgrind", "rennibraut"] },
+  { name: "Kópavogur leiksvæði", lat: 64.1097, lng: -21.9133, address: "Kópavogur", region: "Höfuðborgarsvæði", tags: ["rennibraut", "sandkassi"] },
+  { name: "Akureyri leiksvæði", lat: 65.6835, lng: -18.0878, address: "Akureyri", region: "Norðurland", tags: ["klifurgrind", "rennibraut", "sandkassi"] },
+  { name: "Húsavík leiksvæði", lat: 66.0449, lng: -17.3389, address: "Húsavík", region: "Norðurland", tags: ["rennibraut", "sandkassi"] },
+  { name: "Selfoss leiksvæði", lat: 63.9339, lng: -20.9978, address: "Selfoss", region: "Suðurland", tags: ["klifurgrind", "sandkassi"] },
+  { name: "Keflavík leiksvæði", lat: 64.0000, lng: -22.5561, address: "Keflavík", region: "Suðurnes", tags: ["rennibraut", "sandkassi"] },
+  { name: "Borgarnes leiksvæði", lat: 64.5387, lng: -21.9226, address: "Borgarnes", region: "Vesturland", tags: ["rennibraut", "klifurgrind"] },
+  { name: "Egilsstaðir leiksvæði", lat: 65.2674, lng: -14.3948, address: "Egilsstaðir", region: "Austurland", tags: ["sandkassi", "rennibraut"] },
+];
+
+const regionColors = {
+  "Höfuðborgarsvæði": "#1D9E75",
+  "Norðurland":       "#178DD8",
+  "Suðurland":        "#BA7517",
+  "Suðurnes":         "#D4537E",
+  "Vesturland":       "#7F77DD",
+  "Austurland":       "#D85A30",
+};
+
+const tagColors = {
+  rennibraut:  { bg: "#1D9E7520", color: "#0f6e56", border: "#1D9E7555" },
+  klifurgrind: { bg: "#178DD820", color: "#0c5a8a", border: "#178DD855" },
+  sandkassi:   { bg: "#BA751720", color: "#7a4d0f", border: "#BA751755" },
+  hjólastígur: { bg: "#7F77DD20", color: "#534AB7", border: "#7F77DD55" },
+};
+
+// ============================================================
+//  LEIKSVÆÐI DAGSINS
+// ============================================================
+const dotdIndex = Math.floor(Date.now() / 86400000) % parks.length;
+const dotd = parks[dotdIndex];
+
+document.getElementById('dotd-name').textContent = dotd.name;
+document.getElementById('dotd-meta').textContent = dotd.address + ' · ' + dotd.region;
+document.getElementById('total-count').textContent = parks.length;
+
+// ============================================================
+//  KORT
+// ============================================================
+const map = L.map('map', { zoomControl: true }).setView([64.9, -18.5], 6);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+  maxZoom: 18,
+}).addTo(map);
+
+// Legend
+const legend = L.control({ position: 'bottomright' });
+legend.onAdd = () => {
+  const d = L.DomUtil.create('div', 'legend');
+  const regions = Object.entries(regionColors);
+  d.innerHTML = regions.map(([r, c]) =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${c}"></div><span>${r}</span></div>`
+  ).join('');
+  return d;
+};
+legend.addTo(map);
+
+function makeIcon(color, isDotd) {
+  const size = isDotd ? 36 : 28;
+  const emoji = isDotd ? '⭐' : '🛝';
+  const border = isDotd ? `3px solid ${color}` : '2px solid white';
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:${size}px;height:${size}px;background:${color};border:${border};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${isDotd?17:13}px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">${emoji}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+  });
+}
+
+let allMarkers = [];
+
+parks.forEach(park => {
+  const color = regionColors[park.region] || '#1D9E75';
+  const isDotd = park.name === dotd.name;
+  const marker = L.marker([park.lat, park.lng], { icon: makeIcon(color, isDotd) }).addTo(map);
+  marker.on('click', () => showInfo(park));
+  allMarkers.push({ marker, park });
+});
+
+// ============================================================
+//  INFO PANEL
+// ============================================================
+function showInfo(park) {
+  const color = regionColors[park.region] || '#888';
+  document.getElementById('info-name').textContent = park.name;
+  document.getElementById('info-meta').textContent = park.address + ' · ' + park.region;
+  document.getElementById('info-tags').innerHTML = park.tags.map(tag => {
+    const s = tagColors[tag] || { bg: '#eee', color: '#555', border: '#ccc' };
+    return `<span class="tag-pill" style="background:${s.bg};color:${s.color};border:1px solid ${s.border};">${tag}</span>`;
+  }).join('');
+  document.getElementById('info-panel').style.display = 'block';
+}
+
+function closeInfo() {
+  document.getElementById('info-panel').style.display = 'none';
+}
+
+// ============================================================
+//  FILTER & SEARCH
+// ============================================================
+let activeRegion = 'all';
+
+function applyFilters() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const tag = document.getElementById('filter-tag').value;
+  let visible = 0;
+
+  allMarkers.forEach(({ marker, park }) => {
+    const ms = park.name.toLowerCase().includes(search) || park.address.toLowerCase().includes(search);
+    const mr = activeRegion === 'all' || park.region === activeRegion;
+    const mt = tag === 'all' || park.tags.includes(tag);
+    if (ms && mr && mt) { marker.addTo(map); visible++; }
+    else map.removeLayer(marker);
+  });
+
+  document.getElementById('visible-count').textContent = visible;
+
+  if (activeRegion !== 'all') {
+    const rParks = parks.filter(p => p.region === activeRegion);
+    if (rParks.length) {
+      map.fitBounds(L.latLngBounds(rParks.map(p => [p.lat, p.lng])), { padding: [50, 50], maxZoom: 13 });
+    }
+  }
+}
+
+// Region chips
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeRegion = chip.dataset.region;
+    if (activeRegion === 'all') map.flyTo([64.9, -18.5], 6, { duration: 1 });
+    applyFilters();
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', applyFilters);
+document.getElementById('filter-tag').addEventListener('change', applyFilters);
+
+// Init count
+document.getElementById('visible-count').textContent = parks.length;
+
+// ============================================================
+//  LEIKSVÆÐI DAGSINS — zoom
+// ============================================================
+function zoomToDotd() {
+  map.flyTo([dotd.lat, dotd.lng], 15, { duration: 1.5 });
+  setTimeout(() => showInfo(dotd), 1600);
+}
+</script>
+</body>
+</html>
