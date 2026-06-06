@@ -9,50 +9,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script data-goatcounter="https://agustarnar89.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --green: #1D9E75;
-    --green-light: #e1f5ee;
-    --green-dark: #0f6e56;
-    --sand: #f7f3ed;
-    --ink: #1a1a18;
-    --ink-muted: #5f5e5a;
-    --border: rgba(26,26,24,0.12);
-    --radius: 12px;
-    --font-display: 'Fraunces', Georgia, serif;
-    --font-body: 'DM Sans', sans-serif;
+    --green: #1D9E75; --green-light: #e1f5ee; --green-dark: #0f6e56;
+    --sand: #f7f3ed; --ink: #1a1a18; --ink-muted: #5f5e5a;
+    --border: rgba(26,26,24,0.12); --radius: 12px;
+    --font-display: 'Fraunces', Georgia, serif; --font-body: 'DM Sans', sans-serif;
   }
-
   body { font-family: var(--font-body); background: var(--sand); color: var(--ink); min-height: 100vh; }
 
-  header {
-    background: var(--ink); color: white;
-    padding: 1.25rem 1.5rem 1rem;
-    display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
-  }
+  header { background: var(--ink); color: white; padding: 1.25rem 1.5rem 1rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
   header h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
   header h1 span { color: #5DCAA5; }
   header p { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 4px; }
   #park-count-header { font-family: var(--font-display); font-size: 2rem; font-weight: 400; font-style: italic; color: #5DCAA5; white-space: nowrap; }
   #park-count-header small { display: block; font-family: var(--font-body); font-size: 0.7rem; font-style: normal; color: rgba(255,255,255,0.4); letter-spacing: 0.05em; text-transform: uppercase; }
 
-  /* LOADING */
-  #loading-bar {
-    background: var(--green-light); padding: 0.75rem 1.5rem;
-    display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: var(--green-dark);
-    border-bottom: 1px solid rgba(29,158,117,0.2);
-  }
+  #loading-bar { background: var(--green-light); padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: var(--green-dark); border-bottom: 1px solid rgba(29,158,117,0.2); }
   #loading-bar.hidden { display: none; }
   .spinner { width: 16px; height: 16px; border: 2px solid var(--green-light); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* DOTD */
-  #dotd-section {
-    background: white; border-bottom: 1px solid var(--border);
-    padding: 0.9rem 1.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-  }
+  #dotd-section { background: white; border-bottom: 1px solid var(--border); padding: 0.9rem 1.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
   #dotd-section.hidden { display: none; }
   #dotd-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); background: var(--green-light); padding: 3px 8px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
   #dotd-name { font-family: var(--font-display); font-size: 1rem; font-weight: 600; }
@@ -60,43 +40,69 @@
   #dotd-zoom { margin-left: auto; background: var(--green); color: white; border: none; border-radius: var(--radius); padding: 0.4rem 0.9rem; font-family: var(--font-body); font-size: 0.8rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: background 0.15s; }
   #dotd-zoom:hover { background: var(--green-dark); }
 
-  /* CONTROLS */
   #controls { padding: 0.75rem 1.5rem; background: var(--sand); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid var(--border); }
   #controls input, #controls select { font-family: var(--font-body); font-size: 0.82rem; padding: 0.45rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: white; color: var(--ink); outline: none; transition: border-color 0.15s; }
   #controls input { flex: 1; min-width: 160px; }
   #controls input:focus, #controls select:focus { border-color: var(--green); }
 
-  /* REGION CHIPS */
   #region-chips { padding: 0.6rem 1.5rem; display: flex; gap: 6px; flex-wrap: wrap; background: var(--sand); border-bottom: 1px solid var(--border); }
-  .chip { font-size: 0.75rem; padding: 4px 12px; border-radius: 999px; border: 1px solid; cursor: pointer; transition: opacity 0.15s, transform 0.1s; font-family: var(--font-body); font-weight: 500; }
+  .chip { font-size: 0.75rem; padding: 4px 12px; border-radius: 999px; border: 1px solid; cursor: pointer; transition: opacity 0.15s, transform 0.1s; font-family: var(--font-body); font-weight: 500; background: none; }
   .chip:hover { opacity: 0.8; }
   .chip.active { opacity: 1; transform: scale(1.04); }
 
   #map { width: 100%; height: calc(100vh - 300px); min-height: 340px; }
 
   /* INFO PANEL */
-  #info-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); border-radius: 18px 18px 0 0; padding: 1.25rem 1.5rem 2rem; z-index: 1000; box-shadow: 0 -4px 24px rgba(0,0,0,0.1); animation: slideUp 0.25s ease; }
+  #info-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); border-radius: 18px 18px 0 0; padding: 1.25rem 1.5rem 1.5rem; z-index: 1000; box-shadow: 0 -4px 24px rgba(0,0,0,0.1); animation: slideUp 0.25s ease; max-height: 85vh; overflow-y: auto; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  #info-panel h2 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+  #info-panel h2 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; padding-right: 2rem; }
   #info-panel .meta { font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 10px; }
-  #info-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  #info-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
   .tag-pill { font-size: 0.72rem; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
   #info-close { position: absolute; top: 1rem; right: 1.25rem; background: var(--sand); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink-muted); }
+
+  /* MYNDIR */
+  #info-images { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 4px; }
+  #info-images img { width: 120px; height: 90px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+  #info-images .no-images { font-size: 0.78rem; color: var(--ink-muted); font-style: italic; }
+
+  /* AÐGERÐATAKKAR */
+  .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .btn { font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; padding: 8px 14px; border-radius: 999px; border: none; cursor: pointer; transition: opacity 0.15s; display: inline-flex; align-items: center; gap: 5px; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-outline { background: white; color: var(--ink); border: 1px solid var(--border); }
+  .btn-red { background: #fee2e2; color: #b91c1c; }
+  .btn:hover { opacity: 0.85; }
+
+  /* FORM */
+  .edit-form { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: none; }
+  .edit-form.open { display: block; }
+  .edit-form label { font-size: 0.78rem; font-weight: 500; display: block; margin-bottom: 4px; margin-top: 10px; }
+  .edit-form input, .edit-form textarea { width: 100%; font-family: var(--font-body); font-size: 0.82rem; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
+  .edit-form textarea { height: 70px; resize: vertical; }
+  .edit-form input:focus, .edit-form textarea:focus { border-color: var(--green); }
+  .edit-form .form-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+  /* TILKYNNING FORM */
+  .report-form { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: none; }
+  .report-form.open { display: block; }
+  .report-form p { font-size: 0.82rem; color: var(--ink-muted); margin-bottom: 8px; }
 
   #statusbar { padding: 0.5rem 1.5rem; font-size: 0.75rem; color: var(--ink-muted); background: var(--sand); border-top: 1px solid var(--border); display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
 
   .legend { background: white; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 11px; font-family: var(--font-body); line-height: 1.8; }
   .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-
   .leaflet-control-attribution { font-size: 10px !important; }
+
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 10px 20px; border-radius: 999px; font-size: 0.82rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
 
   @media (max-width: 600px) {
     header, #controls, #region-chips, #statusbar, #dotd-section { padding-left: 1rem; padding-right: 1rem; }
     #map { height: calc(100vh - 340px); }
   }
 </style>
-<script data-goatcounter="https://agustarnar89.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 
@@ -132,7 +138,6 @@
     <option value="rennibraut">Rennibraut</option>
     <option value="klifurgrind">Klifurgrind</option>
     <option value="sandkassi">Sandkassi</option>
-    <option value="hjólastígur">Hjólastígur</option>
   </select>
 </div>
 
@@ -150,33 +155,85 @@
 
 <div id="statusbar">
   <span>🗺️ <strong id="visible-count">0</strong> leikvellir sýnilegir</span>
-  <span id="osm-credit" style="margin-left:auto; font-size:0.7rem; color: var(--ink-muted);">Gögn: © OpenStreetMap contributors</span>
+  <span style="margin-left:auto;font-size:0.7rem;">Gögn: © OpenStreetMap contributors</span>
 </div>
 
 <div id="info-panel">
   <button id="info-close" onclick="closeInfo()">✕</button>
   <h2 id="info-name"></h2>
   <div class="meta" id="info-meta"></div>
-  <div id="info-tags" style="margin-bottom:12px;"></div>
-  <a id="info-gmaps" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:500;color:white;background:#1D9E75;padding:8px 14px;border-radius:999px;text-decoration:none;">🗺️ Opna í Google Maps</a>
+  <div id="info-tags"></div>
+
+  <!-- Myndir -->
+  <div id="info-images"></div>
+
+  <!-- Aðgerðatakkar -->
+  <div class="action-row">
+    <a id="info-gmaps" href="#" target="_blank" rel="noopener" class="btn btn-green">🗺️ Google Maps</a>
+    <button class="btn btn-outline" onclick="toggleEditForm()">✏️ Breyta nafni</button>
+    <button class="btn btn-outline" onclick="triggerImageUpload()">📷 Bæta við mynd</button>
+    <button class="btn btn-red" onclick="toggleReportForm()">🚩 Tilkynna</button>
+  </div>
+
+  <!-- Falinn file input -->
+  <input type="file" id="image-upload" accept="image/*" style="display:none" onchange="uploadImage(event)" />
+
+  <!-- Breyta nafni form -->
+  <div class="edit-form" id="edit-form">
+    <label>Nafn leikvallar</label>
+    <input type="text" id="edit-name" placeholder="t.d. Laugardalur leiksvæði" />
+    <label>Lýsing (valfrjálst)</label>
+    <textarea id="edit-desc" placeholder="Lýstu leiksvæðinu…"></textarea>
+    <div class="form-actions">
+      <button class="btn btn-green" onclick="saveInfo()">Vista</button>
+      <button class="btn btn-outline" onclick="toggleEditForm()">Hætta við</button>
+    </div>
+  </div>
+
+  <!-- Tilkynningarform -->
+  <div class="report-form" id="report-form">
+    <p>Tilkynntu vandamál eða óviðeigandi efni á þessum leikvelti.</p>
+    <div class="form-actions">
+      <button class="btn btn-red" onclick="submitReport()">🚩 Senda tilkynningu</button>
+      <button class="btn btn-outline" onclick="toggleReportForm()">Hætta við</button>
+    </div>
+  </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================================
-//  STILINGAR
+//  SUPABASE
+// ============================================================
+const SUPABASE_URL = 'https://zgqskvahbkliqumaggyl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_fxCEI8Z0mT5C6KdnOHTiLg_ofPA7SVU';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================================
+//  STILLINGAR
 // ============================================================
 const regionColors = {
-  "Höfuðborgarsvæði": "#1D9E75",
-  "Norðurland":       "#178DD8",
-  "Suðurland":        "#BA7517",
-  "Suðurnes":         "#D4537E",
-  "Vesturland":       "#7F77DD",
-  "Austurland":       "#D85A30",
-  "Annað":            "#888780",
+  "Höfuðborgarsvæði": "#1D9E75", "Norðurland": "#178DD8",
+  "Suðurland": "#BA7517", "Suðurnes": "#D4537E",
+  "Vesturland": "#7F77DD", "Austurland": "#D85A30", "Annað": "#888780",
 };
 
-// Grófleg kortlagning eftir breiðdarbilum → landshluti
+const tagColors = {
+  rennibraut:  { bg: "#1D9E7520", color: "#0f6e56", border: "#1D9E7555" },
+  sveifla:     { bg: "#178DD820", color: "#0c5a8a", border: "#178DD855" },
+  klifurgrind: { bg: "#7F77DD20", color: "#534AB7", border: "#7F77DD55" },
+  sandkassi:   { bg: "#BA751720", color: "#7a4d0f", border: "#BA751755" },
+};
+
+const tagMap = {
+  slide: "rennibraut", swing: "sveifla", climbing_frame: "klifurgrind",
+  sandpit: "sandkassi", roundabout: "hringekja", seesaw: "jafnvægisstöng",
+  spring: "gormleikur", zipwire: "þráðlína",
+};
+
 function guessRegion(lat, lng) {
   if (lat > 65.2) return "Norðurland";
   if (lat > 64.6) return "Norðurland";
@@ -187,35 +244,12 @@ function guessRegion(lat, lng) {
   return "Höfuðborgarsvæði";
 }
 
-// OSM tag → íslenskt heiti
-const tagMap = {
-  slide: "rennibraut",
-  swing: "sveifla",
-  climbing_frame: "klifurgrind",
-  sandpit: "sandkassi",
-  roundabout: "hringekja",
-  seesaw: "jafnvægisstöng",
-  spring: "gormleikur",
-  zipwire: "þráðlína",
-};
-
-const tagColors = {
-  rennibraut:   { bg: "#1D9E7520", color: "#0f6e56", border: "#1D9E7555" },
-  sveifla:      { bg: "#178DD820", color: "#0c5a8a", border: "#178DD855" },
-  klifurgrind:  { bg: "#7F77DD20", color: "#534AB7", border: "#7F77DD55" },
-  sandkassi:    { bg: "#BA751720", color: "#7a4d0f", border: "#BA751755" },
-  hringekja:    { bg: "#D4537E20", color: "#993356", border: "#D4537E55" },
-  þráðlína:     { bg: "#D85A3020", color: "#993c1d", border: "#D85A3055" },
-};
-
 // ============================================================
 //  KORT
 // ============================================================
-const map = L.map('map', { zoomControl: true }).setView([64.9, -18.5], 6);
-
+const map = L.map('map').setView([64.9, -18.5], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
-  maxZoom: 19,
+  attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>', maxZoom: 19,
 }).addTo(map);
 
 const legend = L.control({ position: 'bottomright' });
@@ -240,99 +274,68 @@ function makeIcon(color, isDotd) {
 }
 
 // ============================================================
-//  SÆKJA GÖGNs FRÁ OVERPASS API (OpenStreetMap)
+//  GÖGN
 // ============================================================
-let allParks = [];
-let allMarkers = [];
-let dotd = null;
-let activeRegion = 'all';
+let allParks = [], allMarkers = [], dotd = null, activeRegion = 'all';
+let currentPark = null;
 
 async function fetchParks() {
-  const query = `
-    [out:json][timeout:30];
-    area["ISO3166-1"="IS"]->.iceland;
-    (
-      node["leisure"="playground"](area.iceland);
-      way["leisure"="playground"](area.iceland);
-      relation["leisure"="playground"](area.iceland);
-    );
-    out center tags;
-  `;
-  const url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query);
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Overpass API villa');
+  const query = `[out:json][timeout:30];area["ISO3166-1"="IS"]->.iceland;(node["leisure"="playground"](area.iceland);way["leisure"="playground"](area.iceland););out center tags;`;
+  const res = await fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query));
   const data = await res.json();
-
   return data.elements.map(el => {
     const lat = el.lat ?? el.center?.lat;
     const lng = el.lon ?? el.center?.lon;
     if (!lat || !lng) return null;
-
     const t = el.tags || {};
     const name = t.name || t['name:is'] || 'Ónefndur leiksvæði';
-
-    // Þátta búnað úr OSM tags
     const equipment = [];
-    const rawEq = t['playground'] || t['playground:equipment'] || '';
-    rawEq.split(';').forEach(e => {
-      const is = tagMap[e.trim()];
-      if (is && !equipment.includes(is)) equipment.push(is);
-    });
-    // Skoða undireiningar
-    Object.keys(t).forEach(k => {
-      if (k.startsWith('playground:')) {
-        const sub = k.replace('playground:', '');
-        const is = tagMap[sub];
-        if (is && !equipment.includes(is)) equipment.push(is);
-      }
-    });
-
-    const address = [t['addr:street'], t['addr:city']].filter(Boolean).join(', ') || '';
-    const region = guessRegion(lat, lng);
-
-    return { name, lat, lng, address, region, tags: equipment, osmId: el.id };
+    const rawEq = t['playground'] || '';
+    rawEq.split(';').forEach(e => { const is = tagMap[e.trim()]; if (is && !equipment.includes(is)) equipment.push(is); });
+    Object.keys(t).forEach(k => { if (k.startsWith('playground:')) { const is = tagMap[k.replace('playground:','')]; if (is && !equipment.includes(is)) equipment.push(is); } });
+    return { name, lat, lng, address: [t['addr:street'], t['addr:city']].filter(Boolean).join(', '), region: guessRegion(lat, lng), tags: equipment, osmId: String(el.id) };
   }).filter(Boolean);
 }
 
-function renderParks(parks) {
-  // Hreinsa gamla merki
-  allMarkers.forEach(({ marker }) => map.removeLayer(marker));
-  allMarkers = [];
-
-  parks.forEach(park => {
-    const color = regionColors[park.region] || '#888';
-    const isDotd = dotd && park.osmId === dotd.osmId;
-    const marker = L.marker([park.lat, park.lng], { icon: makeIcon(color, isDotd) }).addTo(map);
-    marker.on('click', () => showInfo(park));
-    allMarkers.push({ marker, park });
-  });
-
-  document.getElementById('total-count').textContent = parks.length;
-  document.getElementById('visible-count').textContent = parks.length;
-}
-
-function setupDotd(parks) {
-  const idx = Math.floor(Date.now() / 86400000) % parks.length;
-  dotd = parks[idx];
-  document.getElementById('dotd-name').textContent = dotd.name;
-  document.getElementById('dotd-meta').textContent = (dotd.address || dotd.region);
-  document.getElementById('dotd-section').classList.remove('hidden');
+// Sækja viðbótarupplýsingar úr Supabase
+async function fetchSupabaseInfo(osmIds) {
+  const { data } = await sb.from('playground_info').select('*').in('osm_id', osmIds);
+  const map = {};
+  (data || []).forEach(r => map[r.osm_id] = r);
+  return map;
 }
 
 async function init() {
   try {
-    document.getElementById('loading-text').textContent = 'Sæki leikvelli úr OpenStreetMap…';
     allParks = await fetchParks();
+    if (!allParks.length) throw new Error('Engir leikvellir');
 
-    if (allParks.length === 0) throw new Error('Engir leikvellir fundust');
+    // Sækja Supabase gögn
+    const osmIds = allParks.map(p => p.osmId);
+    const sbInfo = await fetchSupabaseInfo(osmIds);
 
-    setupDotd(allParks);
-    renderParks(allParks);
+    // Sameina gögn
+    allParks = allParks.map(p => ({ ...p, customName: sbInfo[p.osmId]?.name || null, description: sbInfo[p.osmId]?.description || null }));
+
+    const idx = Math.floor(Date.now() / 86400000) % allParks.length;
+    dotd = allParks[idx];
+    document.getElementById('dotd-name').textContent = dotd.customName || dotd.name;
+    document.getElementById('dotd-meta').textContent = (dotd.address || dotd.region);
+    document.getElementById('dotd-section').classList.remove('hidden');
+
+    allParks.forEach(park => {
+      const color = regionColors[park.region] || '#888';
+      const isDotd = park.osmId === dotd.osmId;
+      const marker = L.marker([park.lat, park.lng], { icon: makeIcon(color, isDotd) }).addTo(map);
+      marker.on('click', () => showInfo(park));
+      allMarkers.push({ marker, park });
+    });
+
+    document.getElementById('total-count').textContent = allParks.length;
+    document.getElementById('visible-count').textContent = allParks.length;
     document.getElementById('loading-bar').classList.add('hidden');
-  } catch (err) {
-    document.getElementById('loading-text').textContent = '⚠️ Ekki tókst að sækja gögn — reyndu að endurhlaða síðuna.';
-    console.error(err);
+  } catch(e) {
+    document.getElementById('loading-text').textContent = '⚠️ Ekki tókst að sækja gögn — reyndu að endurhlaða.';
   }
 }
 
@@ -341,47 +344,125 @@ init();
 // ============================================================
 //  INFO PANEL
 // ============================================================
-function showInfo(park) {
-  document.getElementById('info-name').textContent = park.name;
-  const metaParts = [park.address, park.region].filter(Boolean);
-  document.getElementById('info-meta').textContent = metaParts.join(' · ');
+async function showInfo(park) {
+  currentPark = park;
+  document.getElementById('edit-form').classList.remove('open');
+  document.getElementById('report-form').classList.remove('open');
+
+  document.getElementById('info-name').textContent = park.customName || park.name;
+  document.getElementById('info-meta').textContent = [park.address, park.region].filter(Boolean).join(' · ');
   document.getElementById('info-tags').innerHTML = park.tags.length
-    ? park.tags.map(tag => {
-        const s = tagColors[tag] || { bg: '#eee', color: '#555', border: '#ccc' };
-        return `<span class="tag-pill" style="background:${s.bg};color:${s.color};border:1px solid ${s.border};">${tag}</span>`;
-      }).join('')
-    : `<span style="font-size:0.78rem;color:var(--ink-muted);">Engar búnaðaruplýsingar skráðar</span>`;
+    ? park.tags.map(tag => { const s = tagColors[tag] || {bg:'#eee',color:'#555',border:'#ccc'}; return `<span class="tag-pill" style="background:${s.bg};color:${s.color};border:1px solid ${s.border};">${tag}</span>`; }).join('')
+    : `<span style="font-size:0.78rem;color:var(--ink-muted);">Engar búnaðaruplýsingar</span>`;
 
   const gmUrl = `https://www.google.com/maps/search/?api=1&query=${park.lat},${park.lng}`;
   document.getElementById('info-gmaps').href = gmUrl;
+
+  // Sækja myndir
+  await loadImages(park.osmId);
+
   document.getElementById('info-panel').style.display = 'block';
 }
 
 function closeInfo() {
   document.getElementById('info-panel').style.display = 'none';
+  currentPark = null;
 }
 
 // ============================================================
-//  FILTER & SEARCH
+//  MYNDIR
 // ============================================================
+async function loadImages(osmId) {
+  const container = document.getElementById('info-images');
+  container.innerHTML = '';
+  const { data } = await sb.storage.from('playground-images').list(osmId);
+  if (!data || data.length === 0) {
+    container.innerHTML = '<span class="no-images">Engar myndir enn — vertu fyrstur!</span>';
+    return;
+  }
+  data.forEach(file => {
+    const { data: urlData } = sb.storage.from('playground-images').getPublicUrl(`${osmId}/${file.name}`);
+    const img = document.createElement('img');
+    img.src = urlData.publicUrl;
+    img.alt = 'Mynd af leiksvæði';
+    container.appendChild(img);
+  });
+}
+
+function triggerImageUpload() {
+  document.getElementById('image-upload').click();
+}
+
+async function uploadImage(event) {
+  const file = event.target.files[0];
+  if (!file || !currentPark) return;
+  showToast('Hleð upp mynd…');
+  const fileName = `${currentPark.osmId}/${Date.now()}_${file.name}`;
+  const { error } = await sb.storage.from('playground-images').upload(fileName, file);
+  if (error) { showToast('Villa við upphleðslu'); return; }
+  showToast('Mynd vistuð! 📷');
+  await loadImages(currentPark.osmId);
+  event.target.value = '';
+}
+
+// ============================================================
+//  BREYTA NAFNI / LÝSINGU
+// ============================================================
+function toggleEditForm() {
+  const form = document.getElementById('edit-form');
+  form.classList.toggle('open');
+  if (form.classList.contains('open') && currentPark) {
+    document.getElementById('edit-name').value = currentPark.customName || currentPark.name;
+    document.getElementById('edit-desc').value = currentPark.description || '';
+  }
+}
+
+async function saveInfo() {
+  if (!currentPark) return;
+  const name = document.getElementById('edit-name').value.trim();
+  const desc = document.getElementById('edit-desc').value.trim();
+  const { error } = await sb.from('playground_info').upsert({ osm_id: currentPark.osmId, name, description: desc }, { onConflict: 'osm_id' });
+  if (error) { showToast('Villa við vistun'); return; }
+  currentPark.customName = name;
+  currentPark.description = desc;
+  document.getElementById('info-name').textContent = name;
+  document.getElementById('edit-form').classList.remove('open');
+  showToast('Vistað! ✓');
+}
+
+// ============================================================
+//  TILKYNNING
+// ============================================================
+function toggleReportForm() {
+  document.getElementById('report-form').classList.toggle('open');
+}
+
+async function submitReport() {
+  if (!currentPark) return;
+  const { error } = await sb.from('playground_info').upsert({ osm_id: currentPark.osmId, reported: true }, { onConflict: 'osm_id' });
+  if (error) { showToast('Villa við tilkynningu'); return; }
+  document.getElementById('report-form').classList.remove('open');
+  showToast('Tilkynning send 🚩');
+}
+
+// ============================================================
+//  FILTER
+// ============================================================
+let activeRegionFilter = 'all';
 function applyFilters() {
   const search = document.getElementById('search-input').value.toLowerCase();
   const tag = document.getElementById('filter-tag').value;
   let visible = 0;
-
   allMarkers.forEach(({ marker, park }) => {
-    const ms = park.name.toLowerCase().includes(search) || (park.address || '').toLowerCase().includes(search);
-    const mr = activeRegion === 'all' || park.region === activeRegion;
+    const ms = (park.customName || park.name).toLowerCase().includes(search) || (park.address||'').toLowerCase().includes(search);
+    const mr = activeRegionFilter === 'all' || park.region === activeRegionFilter;
     const mt = tag === 'all' || park.tags.includes(tag);
-    if (ms && mr && mt) { marker.addTo(map); visible++; }
-    else map.removeLayer(marker);
+    if (ms && mr && mt) { marker.addTo(map); visible++; } else map.removeLayer(marker);
   });
-
   document.getElementById('visible-count').textContent = visible;
-
-  if (activeRegion !== 'all') {
-    const rParks = allParks.filter(p => p.region === activeRegion);
-    if (rParks.length) map.fitBounds(L.latLngBounds(rParks.map(p => [p.lat, p.lng])), { padding: [50, 50], maxZoom: 13 });
+  if (activeRegionFilter !== 'all') {
+    const rp = allParks.filter(p => p.region === activeRegionFilter);
+    if (rp.length) map.fitBounds(L.latLngBounds(rp.map(p => [p.lat, p.lng])), { padding: [50,50], maxZoom: 13 });
   }
 }
 
@@ -389,22 +470,28 @@ document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
-    activeRegion = chip.dataset.region;
-    if (activeRegion === 'all') map.flyTo([64.9, -18.5], 6, { duration: 1 });
+    activeRegionFilter = chip.dataset.region;
+    if (activeRegionFilter === 'all') map.flyTo([64.9, -18.5], 6, { duration: 1 });
     applyFilters();
   });
 });
-
 document.getElementById('search-input').addEventListener('input', applyFilters);
 document.getElementById('filter-tag').addEventListener('change', applyFilters);
 
-// ============================================================
-//  LEIKSVÆÐI DAGSINS — zoom
-// ============================================================
 function zoomToDotd() {
   if (!dotd) return;
   map.flyTo([dotd.lat, dotd.lng], 16, { duration: 1.5 });
   setTimeout(() => showInfo(dotd), 1600);
+}
+
+// ============================================================
+//  TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 </script>
 </body>
