@@ -86,7 +86,7 @@
   .report-form.open { display: block; }
   .report-form p { font-size: 0.82rem; color: var(--ink-muted); margin-bottom: 8px; }
 
-  /* BÆTA VIÐ LEIKVELTI MODAL */
+  /* BÆTA VIÐ LEIKVELLI MODAL */
   #add-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; }
   #add-modal.open { display: flex; }
   #add-modal-inner { background: white; border-radius: 18px 18px 0 0; padding: 1.5rem; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.25s ease; }
@@ -204,10 +204,10 @@
   </div>
 </div>
 
-<!-- BÆTA VIÐ LEIKVELTI MODAL -->
+<!-- BÆTA VIÐ LEIKVELLI MODAL -->
 <div id="add-modal">
   <div id="add-modal-inner">
-    <h3>Bæta við leikvelti</h3>
+    <h3>Bæta við leikvelli</h3>
     <p>Opið fyrir alla — hægt er að tilkynna ef eitthvað er rangt.</p>
 
     <label>Nafn leikvallar *</label>
@@ -478,7 +478,7 @@ async function submitReport() {
   showToast('Tilkynning send 🚩');
 }
 
-// BÆTA VIÐ LEIKVELTI
+// BÆTA VIÐ LEIKVELLI
 function openAddModal() {
   document.getElementById('add-modal').classList.add('open');
   document.getElementById('coords-display').textContent = 'Smelltu á kortið til að velja staðsetningu';
