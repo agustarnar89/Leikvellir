@@ -156,7 +156,8 @@
   <button id="info-close" onclick="closeInfo()">✕</button>
   <h2 id="info-name"></h2>
   <div class="meta" id="info-meta"></div>
-  <div id="info-tags"></div>
+  <div id="info-tags" style="margin-bottom:12px;"></div>
+  <a id="info-gmaps" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:500;color:white;background:#1D9E75;padding:8px 14px;border-radius:999px;text-decoration:none;">🗺️ Opna í Google Maps</a>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -349,6 +350,9 @@ function showInfo(park) {
         return `<span class="tag-pill" style="background:${s.bg};color:${s.color};border:1px solid ${s.border};">${tag}</span>`;
       }).join('')
     : `<span style="font-size:0.78rem;color:var(--ink-muted);">Engar búnaðaruplýsingar skráðar</span>`;
+
+  const gmUrl = `https://www.google.com/maps/search/?api=1&query=${park.lat},${park.lng}`;
+  document.getElementById('info-gmaps').href = gmUrl;
   document.getElementById('info-panel').style.display = 'block';
 }
 
