@@ -109,6 +109,9 @@
   .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .leaflet-control-attribution { font-size: 10px !important; }
+  .locate-btn { background: white; border: 2px solid rgba(0,0,0,0.2); border-radius: 4px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: 0 1px 5px rgba(0,0,0,0.15); transition: background 0.15s; }
+  .locate-btn:hover { background: #f4f4f4; }
+  .locate-btn.active { background: #e1f5ee; border-color: #1D9E75; }
 
   .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 10px 20px; border-radius: 999px; font-size: 0.82rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
@@ -330,6 +333,41 @@ const map = L.map('map').setView([64.9, -18.5], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>', maxZoom: 19,
 }).addTo(map);
+
+// Staðsetning notanda
+const locateControl = L.control({ position: 'topleft' });
+locateControl.onAdd = () => {
+  const btn = L.DomUtil.create('button', 'locate-btn');
+  btn.innerHTML = '📍';
+  btn.title = 'Finna mig á korti';
+  btn.onclick = locateUser;
+  L.DomEvent.disableClickPropagation(btn);
+  return btn;
+};
+locateControl.addTo(map);
+
+let userMarker = null;
+
+function locateUser() {
+  if (!navigator.geolocation) { showToast('GPS ekki stutt í þessum vafra'); return; }
+  showToast('Finn staðsetningu…');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      if (userMarker) map.removeLayer(userMarker);
+      userMarker = L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: '',
+          html: '<div style="width:18px;height:18px;background:#1D9E75;border:3px solid white;border-radius:50%;box-shadow:0 0 0 3px rgba(29,158,117,0.3);"></div>',
+          iconSize: [18, 18], iconAnchor: [9, 9],
+        })
+      }).addTo(map).bindPopup('📍 Þú ert hér').openPopup();
+      map.flyTo([lat, lng], 15, { duration: 1.5 });
+    },
+    err => { showToast('Gat ekki fundið staðsetningu'); }
+  );
+}
 
 const legend = L.control({ position: 'bottomright' });
 legend.onAdd = () => {
