@@ -113,6 +113,11 @@
   .locate-btn:hover { background: #f4f4f4; }
   .locate-btn.active { background: #e1f5ee; border-color: #1D9E75; }
 
+  footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: 1.25rem 1.5rem; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+  footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  footer a:hover { color: white; }
+  footer strong { color: rgba(255,255,255,0.85); }
+
   .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 10px 20px; border-radius: 999px; font-size: 0.82rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
 
@@ -829,5 +834,10 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 </script>
+<footer>
+  <span>© 2026 <strong>Leikvellir Íslands</strong> · Ábyrgðarmaður: <strong>Ágúst Arnar Þráinsson</strong></span>
+  <span>📧 <a href="mailto:hallo@leikvollur.is">hallo@leikvollur.is</a></span>
+</footer>
+
 </body>
 </html>
