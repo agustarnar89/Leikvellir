@@ -626,6 +626,19 @@ async function showInfo(park) {
     : `<span style="font-size:0.78rem;color:var(--ink-muted);">Engar búnaðaruplýsingar</span>`;
 
   document.getElementById('info-gmaps').href = `https://www.google.com/maps/search/?api=1&query=${park.lat},${park.lng}`;
+
+  // Sýna lýsingu ef hún er til
+  const desc = park.description || '';
+  let descEl = document.getElementById('info-description');
+  if (!descEl) {
+    descEl = document.createElement('p');
+    descEl.id = 'info-description';
+    descEl.style.cssText = 'font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;';
+    document.getElementById('info-tags').after(descEl);
+  }
+  descEl.textContent = desc;
+  descEl.style.display = desc ? 'block' : 'none';
+
   await loadImages(park.osmId);
   document.getElementById('info-panel').style.display = 'block';
 }
