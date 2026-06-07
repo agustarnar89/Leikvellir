@@ -155,6 +155,17 @@
     <option value="sandkassi">Sandkassi</option>
     <option value="aerslabelgur">🦘 Ærslabelgur</option>
   </select>
+  <select id="filter-type">
+    <option value="all">Allar staðir</option>
+    <option value="almenningur">🏞️ Almenningur</option>
+    <option value="leikskoli">🏫 Leikskóli</option>
+    <option value="skoli">🏫 Skóli</option>
+  </select>
+  <select id="filter-fenced">
+    <option value="all">Afgirt / Opið</option>
+    <option value="true">🔒 Afgirt</option>
+    <option value="false">🌿 Opið</option>
+  </select>
   <button id="add-park-btn" onclick="openAddModal()">+ Bæta við leikvelli</button>
 </div>
 
@@ -194,6 +205,17 @@
     <input type="text" id="edit-name" placeholder="t.d. Laugardalur leiksvæði" />
     <label>Lýsing (valfrjálst)</label>
     <textarea id="edit-desc" placeholder="Lýstu leiksvæðinu…"></textarea>
+    <label>Tegund staðar</label>
+    <select id="edit-park-type">
+      <option value="almenningur">🏞️ Almenningsleikvöllur</option>
+      <option value="leikskoli">🏫 Leikskóli</option>
+      <option value="skoli">🏫 Skóli</option>
+      <option value="annad">❓ Annað</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+      <input type="checkbox" id="edit-fenced" style="width:auto;margin:0;" />
+      🔒 Afgirt svæði
+    </label>
     <div class="form-actions">
       <button class="btn btn-green" onclick="saveInfo()">Vista</button>
       <button class="btn btn-outline" onclick="toggleEditForm()">Hætta við</button>
@@ -230,6 +252,19 @@
     <p class="mini-map-hint" id="mini-map-hint">Smelltu á kortið til að merkja staðsetningu</p>
     <input type="hidden" id="add-lat" />
     <input type="hidden" id="add-lng" />
+
+    <label>Tegund staðar</label>
+    <select id="add-park-type">
+      <option value="almenningur">🏞️ Almenningsleikvöllur</option>
+      <option value="leikskoli">🏫 Leikskóli</option>
+      <option value="skoli">🏫 Skóli</option>
+      <option value="annad">❓ Annað</option>
+    </select>
+
+    <label style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+      <input type="checkbox" id="add-fenced" style="width:auto;margin:0;" />
+      🔒 Afgirt svæði
+    </label>
 
     <label>Landshluti</label>
     <select id="add-region">
@@ -587,6 +622,8 @@ function toggleEditForm() {
   if (form.classList.contains('open') && currentPark) {
     document.getElementById('edit-name').value = currentPark.customName || currentPark.name;
     document.getElementById('edit-desc').value = currentPark.description || '';
+    document.getElementById('edit-park-type').value = currentPark.park_type || 'almenningur';
+    document.getElementById('edit-fenced').checked = currentPark.fenced || false;
   }
 }
 
@@ -594,9 +631,13 @@ async function saveInfo() {
   if (!currentPark) return;
   const name = document.getElementById('edit-name').value.trim();
   const desc = document.getElementById('edit-desc').value.trim();
-  const { error } = await sb.from('playground_info').upsert({ osm_id: currentPark.osmId, name, description: desc }, { onConflict: 'osm_id' });
+  const park_type = document.getElementById('edit-park-type').value;
+  const fenced = document.getElementById('edit-fenced').checked;
+  const { error } = await sb.from('playground_info').upsert({ osm_id: currentPark.osmId, name, description: desc, park_type, fenced }, { onConflict: 'osm_id' });
   if (error) { showToast('Villa við vistun'); return; }
   currentPark.customName = name;
+  currentPark.park_type = park_type;
+  currentPark.fenced = fenced;
   document.getElementById('info-name').textContent = name;
   document.getElementById('edit-form').classList.remove('open');
   showToast('Vistað! ✓');
@@ -684,10 +725,12 @@ async function submitNewPark() {
   if (!name) { showToast('Vinsamlegast skráðu nafn'); return; }
   if (!lat || !lng) { showToast('Vinsamlegast veldu staðsetningu'); return; }
 
-  const { data, error } = await sb.from('custom_parks').insert({ name, type, lat, lng, region, description, reported: false }).select();
+  const park_type = document.getElementById('add-park-type').value;
+  const fenced = document.getElementById('add-fenced').checked;
+  const { data, error } = await sb.from('custom_parks').insert({ name, type, lat, lng, region, description, reported: false, park_type, fenced }).select();
   if (error) { showToast('Villa við vistun'); console.error(error); return; }
 
-  const newPark = { name, lat, lng, address: '', region, tags: type === 'ærslabelgur' ? ['ærslabelgur'] : [], osmId: 'custom_' + data[0].id, type, isCustom: true, customId: data[0].id, description };
+  const newPark = { name, lat, lng, address: '', region, tags: type === 'aerslabelgur' ? ['aerslabelgur'] : [], osmId: 'custom_' + data[0].id, type, isCustom: true, customId: data[0].id, description, park_type, fenced };
   allParks.push(newPark);
   const color = regionColors[region] || '#888';
   const marker = L.marker([lat, lng], { icon: makeIcon(color, false, type === 'ærslabelgur') }).addTo(map);
@@ -732,6 +775,8 @@ document.querySelectorAll('.chip').forEach(chip => {
 });
 document.getElementById('search-input').addEventListener('input', applyFilters);
 document.getElementById('filter-tag').addEventListener('change', applyFilters);
+document.getElementById('filter-type').addEventListener('change', applyFilters);
+document.getElementById('filter-fenced').addEventListener('change', applyFilters);
 
 function zoomToDotd() {
   if (!dotd) return;
