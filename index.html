@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 <script data-goatcounter="https://agustarnar89.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -109,6 +111,12 @@
   .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .leaflet-control-attribution { font-size: 10px !important; }
+  .marker-cluster-small { background-color: rgba(29,158,117,0.4) !important; }
+  .marker-cluster-small div { background-color: rgba(29,158,117,0.8) !important; color: white !important; font-weight: 500 !important; }
+  .marker-cluster-medium { background-color: rgba(23,141,216,0.4) !important; }
+  .marker-cluster-medium div { background-color: rgba(23,141,216,0.8) !important; color: white !important; font-weight: 500 !important; }
+  .marker-cluster-large { background-color: rgba(186,117,23,0.4) !important; }
+  .marker-cluster-large div { background-color: rgba(186,117,23,0.8) !important; color: white !important; font-weight: 500 !important; }
   .locate-btn { background: white; border: 2px solid rgba(0,0,0,0.2); border-radius: 4px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: 0 1px 5px rgba(0,0,0,0.15); transition: background 0.15s; }
   .locate-btn:hover { background: #f4f4f4; }
   .locate-btn.active { background: #e1f5ee; border-color: #1D9E75; }
@@ -297,6 +305,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://zgqskvahbkliqumaggyl.supabase.co';
@@ -434,17 +443,41 @@ async function fetchSupabaseInfo(osmIds) {
   return map;
 }
 
+let clusterGroup = null;
+
 function renderMarkers(parks) {
-  allMarkers.forEach(({ marker }) => map.removeLayer(marker));
+  if (clusterGroup) map.removeLayer(clusterGroup);
   allMarkers = [];
+
+  clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 50,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    iconCreateFunction: function(cluster) {
+      const count = cluster.getChildCount();
+      const size = count < 10 ? 36 : count < 50 ? 44 : 52;
+      const bg = count < 10 ? '#1D9E75' : count < 50 ? '#178DD8' : '#BA7517';
+      return L.divIcon({
+        html: '<div style="width:' + size + 'px;height:' + size + 'px;background:' + bg + ';border:3px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:' + (count < 100 ? 13 : 11) + 'px;box-shadow:0 2px 8px rgba(0,0,0,0.25);">' + count + '</div>',
+        className: '',
+        iconSize: [size, size],
+        iconAnchor: [size/2, size/2],
+      });
+    }
+  });
+
   parks.forEach(park => {
     const color = regionColors[park.region] || '#888';
     const isDotd = dotd && park.osmId === dotd.osmId;
     const isBounce = park.type === 'aerslabelgur' || park.type === 'ærslabelgur';
-    const marker = L.marker([park.lat, park.lng], { icon: makeIcon(color, isDotd, isBounce) }).addTo(map);
+    const marker = L.marker([park.lat, park.lng], { icon: makeIcon(color, isDotd, isBounce) });
     marker.on('click', () => showInfo(park));
     allMarkers.push({ marker, park });
+    clusterGroup.addLayer(marker);
   });
+
+  map.addLayer(clusterGroup);
 }
 
 const aerslabelgirData = [
