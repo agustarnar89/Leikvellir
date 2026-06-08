@@ -408,11 +408,29 @@ function makeIcon(color, isDotd, isBounce) {
 let allParks = [], allMarkers = [], dotd = null, currentPark = null;
 let activeRegionFilter = 'all', pickingLocation = false;
 
+const CACHE_KEY = 'leikvellir_osm_cache';
+const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 klukkustundir
+
 async function fetchParks() {
+  // Athuga cache fyrst
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { timestamp, data } = JSON.parse(cached);
+      if (Date.now() - timestamp < CACHE_TTL) {
+        console.log('Nota cache gögn');
+        return data;
+      }
+    }
+  } catch(e) {}
+
+  // Sækja ný gögn
   const query = `[out:json][timeout:30];area["ISO3166-1"="IS"]->.iceland;(node["leisure"="playground"](area.iceland);way["leisure"="playground"](area.iceland););out center tags;`;
   const res = await fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query));
+  if (!res.ok) throw new Error('Overpass API villa: ' + res.status);
   const data = await res.json();
-  return data.elements.map(el => {
+
+  const parks = data.elements.map(el => {
     const lat = el.lat ?? el.center?.lat;
     const lng = el.lon ?? el.center?.lon;
     if (!lat || !lng) return null;
@@ -424,6 +442,13 @@ async function fetchParks() {
     Object.keys(t).forEach(k => { if (k.startsWith('playground:')) { const is = tagMap[k.replace('playground:','')]; if (is && !equipment.includes(is)) equipment.push(is); } });
     return { name, lat, lng, address: [t['addr:street'], t['addr:city']].filter(Boolean).join(', '), region: guessRegion(lat, lng), tags: equipment, osmId: String(el.id), type: 'leiksvæði', isCustom: false };
   }).filter(Boolean);
+
+  // Vista í cache
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: parks }));
+  } catch(e) {}
+
+  return parks;
 }
 
 async function fetchCustomParks() {
@@ -614,7 +639,9 @@ const aerslabelgirData = [
 
 async function init() {
   try {
-    document.getElementById('loading-text').textContent = 'Sæki leikvelli úr OpenStreetMap…';
+    const cached = localStorage.getItem(CACHE_KEY);
+    const usingCache = cached && (Date.now() - JSON.parse(cached).timestamp < CACHE_TTL);
+    document.getElementById('loading-text').textContent = usingCache ? 'Hleð leikvöllum...' : 'Sæki leikvelli úr OpenStreetMap…';
     const osmParks = await fetchParks();
 
     document.getElementById('loading-text').textContent = 'Sæki viðbótargögn…';
