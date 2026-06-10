@@ -33,6 +33,25 @@
     position: relative;
     overflow: hidden;
   }
+  header.has-image {
+    background-image: url('playground-hero.jpg');
+    background-size: cover;
+    background-position: center 40%;
+  }
+  header.has-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(27,67,50,0.88) 0%, rgba(45,106,79,0.75) 60%, rgba(82,183,136,0.5) 100%);
+    z-index: 0;
+  }
+  header.has-image .header-inner {
+    position: relative;
+    z-index: 2;
+  }
+  header.has-image::before {
+    z-index: 2;
+  }
   header::before {
     content: '';
     position: absolute;
@@ -202,7 +221,7 @@
 </head>
 <body>
 
-<header>
+<header class="has-image">
   <div class="header-inner">
     <div>
       <h1>Leikvellir <span>Íslands</span></h1>
