@@ -258,6 +258,7 @@
     <option value="klifurgrind">Klifurgrind</option>
     <option value="sandkassi">Sandkassi</option>
     <option value="aerslabelgur">🦘 Ærslabelgur</option>
+    <option value="ungbarnarola">🍼 Ungbarnaróla</option>
   </select>
   <select id="filter-type">
     <option value="all">Allar staðir</option>
@@ -320,6 +321,10 @@
       <input type="checkbox" id="edit-fenced" style="width:auto;margin:0;" />
       🔒 Afgirt svæði
     </label>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+      <input type="checkbox" id="edit-baby-swing" style="width:auto;margin:0;" />
+      🍼 Ungbarnaróla
+    </label>
     <div class="form-actions">
       <button class="btn btn-green" onclick="saveInfo()">Vista</button>
       <button class="btn btn-outline" onclick="toggleEditForm()">Hætta við</button>
@@ -368,6 +373,10 @@
     <label style="display:flex;align-items:center;gap:8px;margin-top:12px;">
       <input type="checkbox" id="add-fenced" style="width:auto;margin:0;" />
       🔒 Afgirt svæði
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+      <input type="checkbox" id="add-baby-swing" style="width:auto;margin:0;" />
+      🍼 Ungbarnaróla
     </label>
 
     <label>Landshluti</label>
@@ -828,6 +837,7 @@ function toggleEditForm() {
     document.getElementById('edit-desc').value = currentPark.description || '';
     document.getElementById('edit-park-type').value = currentPark.park_type || 'almenningur';
     document.getElementById('edit-fenced').checked = currentPark.fenced || false;
+    document.getElementById('edit-baby-swing').checked = currentPark.baby_swing || false;
   }
 }
 
@@ -837,11 +847,13 @@ async function saveInfo() {
   const desc = document.getElementById('edit-desc').value.trim();
   const park_type = document.getElementById('edit-park-type').value;
   const fenced = document.getElementById('edit-fenced').checked;
-  const { error } = await sb.from('playground_info').upsert({ osm_id: currentPark.osmId, name, description: desc, park_type, fenced }, { onConflict: 'osm_id' });
+  const baby_swing = document.getElementById('edit-baby-swing').checked;
+  const { error } = await sb.from('playground_info').upsert({ osm_id: currentPark.osmId, name, description: desc, park_type, fenced, baby_swing }, { onConflict: 'osm_id' });
   if (error) { showToast('Villa við vistun'); return; }
   currentPark.customName = name;
   currentPark.park_type = park_type;
   currentPark.fenced = fenced;
+  currentPark.baby_swing = baby_swing;
   document.getElementById('info-name').textContent = name;
   document.getElementById('edit-form').classList.remove('open');
   showToast('Vistað! ✓');
@@ -931,10 +943,11 @@ async function submitNewPark() {
 
   const park_type = document.getElementById('add-park-type').value;
   const fenced = document.getElementById('add-fenced').checked;
-  const { data, error } = await sb.from('custom_parks').insert({ name, type, lat, lng, region, description, reported: false, park_type, fenced }).select();
+  const baby_swing = document.getElementById('add-baby-swing').checked;
+  const { data, error } = await sb.from('custom_parks').insert({ name, type, lat, lng, region, description, reported: false, park_type, fenced, baby_swing }).select();
   if (error) { showToast('Villa við vistun'); console.error(error); return; }
 
-  const newPark = { name, lat, lng, address: '', region, tags: type === 'aerslabelgur' ? ['aerslabelgur'] : [], osmId: 'custom_' + data[0].id, type, isCustom: true, customId: data[0].id, description, park_type, fenced };
+  const newPark = { name, lat, lng, address: '', region, tags: type === 'aerslabelgur' ? ['aerslabelgur'] : [], osmId: 'custom_' + data[0].id, type, isCustom: true, customId: data[0].id, description, park_type, fenced, baby_swing };
   allParks.push(newPark);
   const color = regionColors[region] || '#888';
   const marker = L.marker([lat, lng], { icon: makeIcon(color, false, type === 'ærslabelgur') }).addTo(map);
@@ -958,7 +971,7 @@ function applyFilters() {
     const mr = activeRegionFilter === 'all' || park.region === activeRegionFilter;
     const allTags = [...(park.tags||[])];
     if (park.type === 'aerslabelgur' || park.type === 'ærslabelgur') allTags.push('ærslabelgur');
-    const mt = tag === 'all' || allTags.includes(tag);
+    const mt = tag === 'all' || allTags.includes(tag) || (tag === 'ungbarnarola' && park.baby_swing);
     if (ms && mr && mt) { marker.addTo(map); visible++; } else map.removeLayer(marker);
   });
   document.getElementById('visible-count').textContent = visible;
